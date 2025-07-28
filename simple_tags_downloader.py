@@ -30,7 +30,7 @@ async def fetch_api_page(client: httpx.AsyncClient, url: str) -> dict:
         response.raise_for_status()
     return response.json()
 
-async def fetch_image_list(client: httpx.AsyncClient, username: str) -> list:
+async def fetch_image_list(client: httpx.AsyncClient, tags: str) -> list:
     """Fetches the complete list of image data using cursor-based pagination."""
     all_images = []
     page_num = 1
@@ -47,7 +47,7 @@ async def fetch_image_list(client: httpx.AsyncClient, username: str) -> list:
             
             items = data.get('items', [])
             if not items and page_num == 1:
-                print(f"User '{username}' found, but they have no public images.")
+                print(f"tags '{tags}' found, but they have no public images.")
                 return []
             
             all_images.extend(items)
@@ -65,7 +65,7 @@ async def fetch_image_list(client: httpx.AsyncClient, username: str) -> list:
             print(f"\nFailed to fetch image batch {page_num}: {e}. Stopping.")
             break
             
-    print(f"Found a total of {len(all_images)} images for {username}.")
+    print(f"Found a total of {len(all_images)} images for {tags}.")
     return all_images
 
 async def download_image(session: httpx.AsyncClient, image_data: dict, output_dir: str, semaphore: asyncio.Semaphore):
@@ -101,9 +101,9 @@ async def download_image(session: httpx.AsyncClient, image_data: dict, output_di
 
 async def main():
     """Main function to run the downloader."""
-    username = input("Enter the Civitai username to download from: ").strip()
-    if not username:
-        print("Username cannot be empty.")
+    tags = input("Enter the Civitai tags to download from: ").strip()
+    if not tags:
+        print("tags cannot be empty.")
         return
 
     # Try to read API key from file
@@ -123,14 +123,14 @@ async def main():
     if api_key:
         DEFAULT_HEADERS['Authorization'] = f'Bearer {api_key}'
 
-    output_dir = os.path.join(".", username)
+    output_dir = os.path.join(".", tags)
     os.makedirs(output_dir, exist_ok=True)
     print(f"Images will be saved in: {os.path.abspath(output_dir)}")
 
     semaphore = asyncio.Semaphore(CONCURRENT_DOWNLOADS)
 
     async with httpx.AsyncClient(headers=DEFAULT_HEADERS, timeout=60.0) as client:
-        images_to_download = await fetch_image_list(client, username)
+        images_to_download = await fetch_image_list(client, tags)
 
         if not images_to_download:
             print("No images to download. Exiting.")
