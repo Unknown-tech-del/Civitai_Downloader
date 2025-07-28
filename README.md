@@ -19,7 +19,7 @@ Run the downloader from the command line:
 python simple_tags_downloader.py
 ```
 
-You will be asked for the Civitai username. Images are saved into a folder named after that user. Existing files are skipped.
+You will be asked for the Civitai tags. Images are saved into a folder named after that tags. Existing files are skipped.
 
 For authenticated requests, place your API key in a file named `civitai_api_key.txt` in the same directory. The script will read it automatically.
 
