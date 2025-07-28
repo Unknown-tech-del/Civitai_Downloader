@@ -35,7 +35,7 @@ async def fetch_image_list(client: httpx.AsyncClient, username: str) -> list:
     all_images = []
     page_num = 1
     
-    base_url = f"{BASE_API_URL}?username={username}&nsfw=X&sort=Newest&period=AllTime&limit=100"
+    base_url = f"{BASE_API_URL}?tags={tags}&nsfw=X&sort=Most+Reactions&baseModels=Flux.1+D&period=AllTime&limit=100"
     next_cursor = None
 
     while True: 
